@@ -1,0 +1,12 @@
+The default is to install the binary and man page into /usr and to look for
+the global config in /etc.
+
+If you wish to install entirely into /usr/local, do the following:
+
+	make PREFIX=/usr/local CONF=/usr/local/etc/ondirrc install
+
+To install to a "package root" do this:
+	make DESTDIR=/tmp/ondir.pkg install
+
+Once you have installed OnDir, add either scripts.sh or scripts.tcsh to your
+startup. This will execute ondir whenever you change directories at the shell.

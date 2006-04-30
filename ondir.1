@@ -1,0 +1,128 @@
+.\" ondir is licensed under the GPL, version 2. A copy of the GPL should have been distributed with the source in the file COPYING
+.TH "ondir" "1" "0.2.0" "Alec Thomas" "Shell utility"
+.SH "NAME"
+.LP 
+ondir \- automatically execute scripts when traversing directories at the command line
+.SH "SYNPOSIS"
+.LP 
+\fBondir <old\-directory> [<new\-directory>]\fP
+.LP 
+.SH "DESCRIPTION"
+.LP 
+\fBNOTE: The 0.2.x series has been completely rewritten in C. In addition, the configuration file format is substantially different.
+.LP 
+\fBondir\fP is a program that executes a script when entering or leaving a directory. It also executes all scripts in the intermediate directories between the two.
+.LP 
+For example, when changing from /opt/music to /home, leave scripts for /opt/music and /opt are executed, then the enter script for /home is executed.
+.LP 
+The scripts are defined in either the system\-wide rc file (/etc/ondirrc) or per user rc files (~/.ondirrc).
+.LP 
+The way \fBondir\fR works is by using auxiliary scripts that override shell builtins (cd, pushd and popd in BASH) to execute \fBondir\fR whenever a user changes directory. These scripts are included in the section SCRIPTS, below.
+.LP 
+The scripts are available in the source tarball and are called \fBscripts.sh\fR, \fBscripts.tcsh\fR for Bourne shell variants and TCSH, respectively.
+.SH "OPTIONS"
+.TP 
+\fB<old\-directory>\fR
+The last directory you were in, after having changed to the new directory.
+.TP 
+\fB[<new\-directory>]\fR
+The current directory. This is optional, but can be useful when traversing symbolically linked paths, as it will use the logical path rather than the physical path. If left out, ondir uses getcwd().
+.LP 
+
+.SH "CONFIGURATION"
+.LP 
+The configuration files /etc/ondirrc and ~/.ondirrc are in the form:
+.LP 
+# Comment
+.br 
+enter \fB<path>[:<path>[:...]]\fR
+.br 
+	\fB<shell script body>\fR
+.br 
+leave \fB<path>[:<path>[:...]]\fR
+.br 
+	\fB<shell script body>\fR
+.LP
+Any line with leading whitespace is assumed to belong to the last valid enter or leave section.
+.LP
+\fB<path>\fR is the path to match. Regular expression support has been included since version 0.2.1 thanks to Arvind (?). A path must match completely to be considered a match. Because : is the path delimiter, it can not be used in any regular expressions.
+.LP
+Arvind also re-added (from version 0.1.x) support for $ONDIRWD expansion. This environment variable will contain the directory currently being traversed.
+.LP 
+A perfect example of the usefulness of this program is a users public_html directory.
+.LP 
+I personally set my default umask to 077, but when editing in my public_html directory I want my umask to be 022. To do this automatically, I would have add the following to my ~/.ondirrc
+.TP 
+\fB~/.ondirrc\fR
+enter /home/athomas/public_html
+.br 
+	umask 022
+.br 
+leave /home/athomas/public_html
+.br 
+	umask 077
+.LP 
+Another good example is if you have a "bin" directory in a project, but don't want to add it permanently to your PATH. The following ondir scripts take care of that:
+.TP 
+\fB~/.ondirrc\fR
+enter /home/athomas/projects/myproject
+.br 
+	PATH=$PATH:$CWD/bin
+.br 
+leave /home/athomas/projects/myproject
+.br 
+	PATH=`echo $PATH | sed \-e "s,:$CWD/bin,,g"`
+.SH "SCRIPTS"
+.LP 
+The BASH script you should add to your profile is:
+.LP 
+cd()
+.br 
+{
+.br 
+    builtin cd "$@" && eval "`ondir \\"$OLDPWD\\" \\"$PWD\\"`"
+.br 
+}
+.br 
+.br 
+pushd()
+.br 
+{
+.br 
+    builtin pushd "$@" && eval "`ondir \\"$OLDPWD\\" \\"$PWD\\"`"
+.br 
+}
+.br 
+.br 
+popd()
+.br 
+{
+.br 
+    builtin popd "$@" && eval "`ondir \\"$OLDPWD\\" \\"$PWD\\"`"
+.br 
+}
+.br 
+.br 
+eval "`ondir /`"
+.br 
+.LP 
+The TCSH script you should add to your profile is:
+.LP 
+alias cwdcmd eval \`ondir \-t \$owd \$cwd\` 
+.br 
+.br 
+# Run ondir on login
+.br 
+eval `ondir \-t /`
+.br 
+.SH "AUTHORS"
+.LP 
+Alec Thomas \fI<alec@swapoff.org>\fR
+.SH "SEE ALSO"
+.LP 
+devtodo(1) \fI<http://swapoff.org/DevTodo>\fR
+.SH "NOTES"
+.LP
+\fBondir\fR also has the ability to execute scripts in the directories being traversed. These scripts are named \fB.onenter\fR and \fB.onleave\fR. This ability is disabled by default, but can be enabled by editing conf.h and uncommenting:
+.LP
+#define USE_ONENTERLEAVE

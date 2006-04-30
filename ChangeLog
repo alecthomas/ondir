@@ -1,0 +1,80 @@
+0.2.2
+  * Added ~ expansion in ~/.ondirrc paths (only works if ~ is first character)
+  * Added envar expansion in the definition and bodies of enter/leave sections.
+    eg.
+      enter $HOME/projects/.*
+          echo "You have entered ${ONDIRWD}"
+  * Added regular expression sub-pattern capturing. This lets you do things like:
+      {{{
+      enter $HOME/cvs/([^/]+)/?
+          echo "You have entered the CVS directory for $1"
+      }}}
+    $0 is equivalent to $ONDIRWD. Thanks to Wolfram Schlich for this idea. Nice.
+
+0.2.1
+  * Fixed stupid compile problem when .onenter/.onleave support is enabled.
+    Thanks to Steve Huff for picking this up.
+  * Added a patch from Arvind SV which adds regex matching support for paths.
+    Nice. eg. enter /usr/src/linux(-2.4.21(-xfs)?)?
+  * Arvind also added $ONDIRWD support from the pre-0.2.x versions back in. Quite
+    a handy thing to have, thanks Arvind.
+
+0.2.0
+  * Rewritten in C. This makes it smaller and faster and no longer takes half an
+    hour to compile.
+  * Configuration file format has changed completely. Read the README or man page
+    for more information.
+  * No longer using autoconf/automake as it's overkill for 400 lines of source.
+
+0.1.6
+  * Fixed some errors in the man page, picked up thanks to Wolfram Schlich.
+  * Fixed some potential quoting problems in the man page and migrate.sh.
+
+0.1.5
+  * Commented out some extraneous functions (drand) which were not being used but
+    caused compile problems on OSX.
+  * Fixed some other compilation issues on OSX. Thanks to Ben Hines for both of
+    these OSX fixes.
+  * Fixed some fairly major problems in the man page, referring to todorc rather
+    than ondirrc. Thanks again to Ben Hines for picking this up.
+  * Re-added .onenter/.onleave support, but optionally (use -o to enable this 
+    behaviour).
+  * You can now pass the current working directory on the command line as the
+    second option. This fixes problems with traversing paths containing symlinks.
+    Thanks to Ralf Engelschall for pointing this out.
+  * Cleaned up the code a bit.
+
+0.1.4
+  * Applied a patch sent in by Jason Kissinger to fix some cases where ; was not 
+    being added to the end of shell lines, causing TCSH to barf.
+  * The rc file lexer no longer uses regular expressions, but hard-coded lexical
+    element recognisers. It is an order of magnitude faster.
+  * OnDir will no longer execute .onenter or .onleave scripts. This was a security
+    disaster waiting to happen. There is a script included in the distribution
+    called migrate.sh which will migrate any existing .onenter/.onleave scripts
+    into your ~/.ondirrc. It is used by passing the paths you wish to migrate as
+    arguments.
+
+0.1.3
+  * Fixed Makefile.am in ./src so all the source files are packaged - duh.
+  * Changed static reference to ~athomas/.ondirrc to the generic case of 
+    $HOME/.ondirrc. Another stupid one.
+  * Fixed broken TCSH handling. Thanks to Daniel Macks for hunting this down as
+    well as the previous bug.
+
+0.1.2
+  * Now check for a .onexit as well.
+  * Unset ONDIRWD variable after scripts have executed.
+  * Added a config file /etc/ondirrc or ~/.ondirrc that contains directories and 
+    enter/exit scripts. This is the most secure way of having scripts execute and
+    is preferred over .onenter and .onleave. See man page for further information.
+    Thanks to Darren Chamberlain for this idea.
+
+0.1.1
+  * Added a patch sent in by Mira Tempír to check for group/other write 
+    permissions on the scripts and refuse to run them if they are set.
+    Subsequently changed the name of the function to make more sense.
+  * Added -V to display version.
+
+0.1.0
+  * Released.

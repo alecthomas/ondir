@@ -1,0 +1,11 @@
+# vim:syntax=sh
+
+# I have these directories setgid, so I want my umask to allow group writes.
+enter /opt/music:/opt/movies
+	# Preserve umask
+	OLDUMASK=`umask`
+	umask 007
+
+# Back to normal
+leave /opt/music:/opt/movies
+	umask $OLDUMASK
