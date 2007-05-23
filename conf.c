@@ -155,7 +155,7 @@ va_list args;
 	va_end(args);
 }
 
-/* Expand all environment variables */
+/* Expand internal ONDIR environment variables */
 char *expand_envars(const char *in) {
 int inlen = strlen(in), outmax = inlen * 2, outlen = 0;
 char *out = calloc(1, outmax);
@@ -180,21 +180,26 @@ char *out = calloc(1, outmax);
 
 				strncpy(var, varstart, varlen);
 				var[varlen] = 0;
-				val = getenv(var);
-				if (val) {
-				int vallen = strlen(val);
 
-					if (outlen + vallen >= outmax) {
-						outmax = outmax * 2 + vallen;
-						out = realloc(out, outmax);
-					}
-					strcat(out, val);
-					outlen += vallen;
-					in = mark + varlen + bracketed * 2 + 1;
-					continue;
-				} else {
+				if (strcmp(var, "ONDIRWD") && (var[0] < '0' || var[0] > '9')) {
 					in = mark;
-					out[outlen] = 0;
+				} else {
+					val = getenv(var);
+					if (val) {
+					int vallen = strlen(val);
+
+						if (outlen + vallen >= outmax) {
+							outmax = outmax * 2 + vallen;
+							out = realloc(out, outmax);
+						}
+						strcat(out, val);
+						outlen += vallen;
+						in = mark + varlen + bracketed * 2 + 1;
+						continue;
+					} else {
+						in = mark;
+						out[outlen] = 0;
+					}
 				}
 			}
 		}
