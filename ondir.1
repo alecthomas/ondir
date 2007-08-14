@@ -1,5 +1,5 @@
 .\" ondir is licensed under the GPL, version 2. A copy of the GPL should have been distributed with the source in the file COPYING
-.TH "ondir" "1" "0.2.0" "Alec Thomas" "Shell utility"
+.TH "ondir" "1" "0.2.3" "Alec Thomas" "Shell utility"
 .SH "NAME"
 .LP 
 ondir \- automatically execute scripts when traversing directories at the command line
@@ -35,15 +35,17 @@ The configuration files /etc/ondirrc and ~/.ondirrc are in the form:
 .LP 
 # Comment
 .br 
-enter \fB<path>[:<path>[:...]]\fR
+[final] enter \fB<path>[:<path>[:...]]\fR
 .br 
 	\fB<shell script body>\fR
 .br 
-leave \fB<path>[:<path>[:...]]\fR
+[final] leave \fB<path>[:<path>[:...]]\fR
 .br 
 	\fB<shell script body>\fR
 .LP
 Any line with leading whitespace is assumed to belong to the last valid enter or leave section.
+.LP
+\fBfinal\fB indicates that the section will be the last one executed for the matching directory. Directories further down the hierarchy will still be matched.
 .LP
 \fB<path>\fR is the path to match. Regular expression support has been included since version 0.2.1 thanks to Arvind (?). A path must match completely to be considered a match. Because : is the path delimiter, it can not be used in any regular expressions.
 .LP

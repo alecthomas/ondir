@@ -7,5 +7,6 @@ enter /opt/music:/opt/movies
 	umask 007
 
 # Back to normal
-leave /opt/music:/opt/movies
+final leave /opt/music:/opt/movies
 	umask $OLDUMASK
+	unset OLDUMASK

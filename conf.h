@@ -17,7 +17,7 @@ typedef enum {
 
 struct odpath_t {
 	const char **paths, *content;
-	int npaths;
+	int npaths, final;
 	pathtype_t type;
 	struct odpath_t *next;
 };

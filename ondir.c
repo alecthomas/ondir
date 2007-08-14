@@ -81,7 +81,8 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 	regmatch_t match[10];
 	struct odpath_t *p;
 
-		for (p = find_path(NULL, working, PT_LEAVE, match); p; p = find_path(p, working, PT_LEAVE, match)) {
+		for (p = find_path(NULL, working, PT_LEAVE, match); p;
+			 p = find_path(p, working, PT_LEAVE, match)) {
 		char *sub;
 
 			/* Construct temporary envars */
@@ -107,6 +108,8 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 			}
 			printf("%s\n", sub);
 			free(sub);
+			if (p->final)
+				break;
 		}
 #ifdef USE_ONENTERLEAVE
 		snprintf(onenter, PATH_MAX, "%s/.onleave", working);
@@ -129,7 +132,8 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 			++len;
 		strncpy(working, dst, len);
 		working[len] = 0;
-		for (p = find_path(NULL, working, PT_ENTER, match); p; p = find_path(p, working, PT_ENTER, match)) {
+		for (p = find_path(NULL, working, PT_ENTER, match); p;
+			 p = find_path(p, working, PT_ENTER, match)) {
 		char *sub;
 		int i = 0;
 
@@ -156,6 +160,8 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 			}
 			printf("%s", sub);
 			free(sub);
+			if (p->final)
+				break;
 		}
 #ifdef USE_ONENTERLEAVE
 		snprintf(onenter, PATH_MAX, "%s/.onenter", working);

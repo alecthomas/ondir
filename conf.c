@@ -70,8 +70,17 @@ int line = 0, sec_size = 0;
 				memset(section, 0, MAX_SECTION_SIZE);
 
 				/* read stuff */
-				if (!(tok = strtok(buffer, " \t")) || (strcmp(tok, "enter") && strcmp(tok, "leave")))
-					fatal("%s:%i: expected enter or leave", file, line);
+				tok = strtok(buffer, " \t");
+				if (!tok)
+					fatal("%s:%i: unexpected end of line", file, line);
+
+				if (!strcmp(tok, "final")) {
+					current->final = 1;
+					tok = strtok(NULL, " \t");
+				}
+
+				if (strcmp(tok, "enter") && strcmp(tok, "leave"))
+					fatal("%s:%i: line should start with final, enter or leave", file, line);
 
 				if (!strcmp(tok, "enter"))
 					current->type = PT_ENTER;
