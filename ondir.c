@@ -15,9 +15,7 @@ struct odpath_t *root;
 char *substitute(const char *in, const char *var, const char *val);
 int add_envar(const char *var, const char *val);
 int check_regex(const char *regex, const char *line, regmatch_t match[10]);
-struct odpath_t *find_path(const char *path, pathtype_t type, regmatch_t match[10]);
-struct odpath_t *find_enter(const char *path, regmatch_t match[10]);
-struct odpath_t *find_leave(const char *path, regmatch_t match[10]);
+struct odpath_t *find_path(struct odpath_t *last, const char *path, pathtype_t type, regmatch_t match[10]);
 void usage(const char *msg);
 
 #ifdef USE_ONENTERLEAVE
@@ -81,9 +79,9 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 	/* Traverse up source path */
 	while (strncmp(working, dst, len)) {
 	regmatch_t match[10];
-	struct odpath_t *p = find_leave(working, match);
+	struct odpath_t *p;
 
-		if (p) {
+		for (p = find_path(NULL, working, PT_LEAVE, match); p; p = find_path(p, working, PT_LEAVE, match)) {
 		char *sub;
 
 			/* Construct temporary envars */
@@ -108,7 +106,7 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 				putenv(var);
 			}
 			printf("%s\n", sub);
-			free (sub);
+			free(sub);
 		}
 #ifdef USE_ONENTERLEAVE
 		snprintf(onenter, PATH_MAX, "%s/.onleave", working);
@@ -131,7 +129,7 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 			++len;
 		strncpy(working, dst, len);
 		working[len] = 0;
-		if ((p = find_enter(working, match))) {
+		for (p = find_path(NULL, working, PT_ENTER, match); p; p = find_path(p, working, PT_ENTER, match)) {
 		char *sub;
 		int i = 0;
 
@@ -247,11 +245,16 @@ int retval = 0;
 	return retval == 0 && match[0].rm_so == 0 && match[0].rm_eo == strlen(line);
 }
 
-struct odpath_t *find_path(const char *path, pathtype_t type, regmatch_t match[10]) {
+struct odpath_t *find_path(struct odpath_t *last, const char *path, pathtype_t type, regmatch_t match[10]) {
 struct odpath_t *i;
 int j;
 
-	for (i = root; i != NULL; i = i->next)
+	if (last)
+		last = last->next;
+	else
+		last = root;
+
+	for (i = last; i != NULL; i = i->next)
 		if (i->type == type) {
 			for (j = 0; j < i->npaths; ++j)
 				if (!strcmp(i->paths[j], path)) {
@@ -300,14 +303,6 @@ struct stat s;
 		!(s.st_mode & (S_IWGRP | S_IWOTH)); /* ...not group/world writeable */
 }
 #endif
-
-struct odpath_t *find_enter(const char *path, regmatch_t match[10]) {
-	return find_path(path, PT_ENTER, match);
-}
-
-struct odpath_t *find_leave(const char *path, regmatch_t match[10]) {
-	return find_path(path, PT_LEAVE, match);
-}
 
 void usage(const char *msg) {
 	printf(
