@@ -34,8 +34,8 @@ clean:
 	rm -f $(OBJS) $(TARGET)
 
 install: $(TARGET)
-	install -m 755 -d $(DESTDIR)$(PREFIX)/man/man1
-	install -m 644 ondir.1 $(DESTDIR)$(PREFIX)/man/man1
+	install -m 755 -d $(DESTDIR)$(PREFIX)/share/man/man1
+	install -m 644 ondir.1 $(DESTDIR)$(PREFIX)/share/man/man1
 	install -m 755 -d $(DESTDIR)$(PREFIX)/bin
 	install -m 755 ondir $(DESTDIR)$(PREFIX)/bin
 
