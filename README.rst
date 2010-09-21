@@ -1,3 +1,6 @@
+OnDir
+=====
+
 Introduction
 ------------
 ondir is a small program to automate tasks specific to certain directories. It
@@ -22,13 +25,13 @@ by default, but when creating web pages in ~/public_html the web content has
 to be readable by the user the web server runs as. By adding a path section for
 this directory to my ~/.ondirrc, and corresponding enter and leave sub-sections,
 any scripts in the enter/leave sub-sections are executed when I enter and leave
-the directory, respectively. Here is how the entry in my ~/.ondirrc would look:
+the directory, respectively. Here is how the entry in my ~/.ondirrc would look::
 
-enter /home/athomas/public_html
-	umask 022
+  enter /home/athomas/public_html
+    umask 022
 
-leave /home/athomas/public_html
-	umask 077
+  leave /home/athomas/public_html
+    umask 077
 
 And that's all it does. Simple, but effective. 
 
@@ -40,19 +43,19 @@ execute the 'enter' in ~/public_html. The reverse is also true: when leaving
 a path, all 'leave' scripts in the intermediate directories are executed.
 
 Another useful example is if you have a project with its own "bin" directory.
-You can use the following:
+You can use the following::
 
-enter /home/athomas/projects/myproject
-	PATH=$PATH:$ONDIRWD/bin
+  enter /home/athomas/projects/myproject
+    PATH=$PATH:$ONDIRWD/bin
 
-leave /home/athomas/projects/myproject
-	PATH=`echo $PATH | sed -e "s,:$ONDIRWD/bin,,g"`
+  leave /home/athomas/projects/myproject
+    PATH=`echo $PATH | sed -e "s,:$ONDIRWD/bin,,g"`
 
-Example of usage:
+Example of usage::
 
-[alec@cavern:~]umask
-077
-[alec@cavern:~]cd public_html
-[alec@cavern:~/public_html]umask
-022
-[alec@cavern:~/public_html]
+  [alec@cavern:~]umask
+  077
+  [alec@cavern:~]cd public_html
+  [alec@cavern:~/public_html]umask
+  022
+  [alec@cavern:~/public_html]
