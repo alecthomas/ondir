@@ -42,20 +42,17 @@ as well. Using the preceding example, typing "cd ~/public_html/mywebpage" will
 execute the 'enter' in ~/public_html. The reverse is also true: when leaving 
 a path, all 'leave' scripts in the intermediate directories are executed.
 
-Another useful example is if you have a project with its own "bin" directory.
-You can use the following::
+A more useful example
+---------------------
+Ondir is particularly useful with `virtualenv
+<http://pypi.python.org/pypi/virtualenv>`_. The following config will
+automatically activate virtualenv's when you change into a directory and
+deactivate when you move out::
 
-  enter /home/athomas/projects/myproject
-    PATH=$PATH:$ONDIRWD/bin
+  enter ~/Projects/([^/]+)
+    if [ -r .venv ]; then
+      . ./.venv/bin/activate
+    fi
 
-  leave /home/athomas/projects/myproject
-    PATH=`echo $PATH | sed -e "s,:$ONDIRWD/bin,,g"`
-
-Example of usage::
-
-  [alec@cavern:~]umask
-  077
-  [alec@cavern:~]cd public_html
-  [alec@cavern:~/public_html]umask
-  022
-  [alec@cavern:~/public_html]
+  leave ~/Projects/([^/]+)
+    deactivate > /dev/null 2>&1
