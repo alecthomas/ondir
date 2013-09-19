@@ -60,12 +60,12 @@ rpm: dist $(TARGET)
 
 dist: clean
 	rm -f ondir-$(VERSION)* && \
-		todo -T && \
 		cd .. && \
 		mv ondir ondir-$(VERSION) && \
-		tar -czv --exclude 'old/*' --exclude '.*.swp' -f ondir-$(VERSION).tar.gz ondir-$(VERSION) && \
+		tar -czv --exclude '.git*' --exclude 'old/*' --exclude '.*.swp' -f ondir-$(VERSION).tar.gz ondir-$(VERSION) && \
 		mv ondir-$(VERSION) ondir && \
-		mv ondir-$(VERSION).tar.gz ondir
+		mv ondir-$(VERSION).tar.gz ondir && \
+		chmod 644 ondir/ondir-$(VERSION).tar.gz
 
 dep:
 	@makedepend $(CXXFLAGS) $(SOURCES) 2> /dev/null
