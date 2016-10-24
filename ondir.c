@@ -46,7 +46,7 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 
 		if (!src) src = argv[i];
 		else
-		if (!dst) dst = argv[i];
+		if (!dst) dst = strdup(argv[i]);
 		else
 			usage("You have already specified src and dst directories");
 	}
@@ -55,6 +55,10 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 		getcwd(cwd, PATH_MAX);
 		dst = cwd;
 	}
+	len = strlen(dst);
+	// If `dst` ends with '/', trim to simplify checks in loop head
+	if (len && dst[len] == '/')
+		((char*)dst)[len] = 0;
 
 	if (src[0] != '/' || dst[0] != '/')
 		fatal("either the source or destination directory is not absolute");
@@ -77,7 +81,7 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 	len = strlen(working);
 
 	/* Traverse up source path */
-	while (strncmp(working, dst, len)) {
+	while (strncmp(working, dst, len) || (dst[len] && dst[len] != '/')) {
 	regmatch_t match[10];
 	struct odpath_t *p;
 
@@ -171,6 +175,8 @@ const char *src = NULL, *dst = NULL, *home = NULL;
 		if (dst[len] == '/') ++len;
 	}
 
+	if (dst && dst != cwd)
+		free((void*)dst);
 	return 0;
 }
 
